@@ -176,9 +176,9 @@
 
   <script>
     // ==============
-    // 1) TES 6 LISTES
+    // 1) LISTES
     // ==============
-    // Modifie librement : ajoute/retire des mots, change les thèmes, etc.
+
 const WORD_LISTS = [
   {
     id: "liste1",
@@ -387,9 +387,10 @@ const WORD_LISTS = [
     id: "liste6",
     label: "Graines d'Opti",
     words: [
-      "c'est la faute à... Botaire..",
+      "c'est... euh.. la faute à Botaire..",
       "Mnemeoooo",
-      "trop.. Hips.. mignon le Kiki",
+      "HEY !... le rosé...",
+      "OPTI CHILL",
     ]
   }
 ];
@@ -397,8 +398,6 @@ const WORD_LISTS = [
     // ==================================
     // 2) REMPLACEMENTS (mots -> autres)
     // ==================================
-    // Idée : certains mots du texte original doivent être remplacés.
-    // La clé est en minuscule ; le remplacement sera adapté à la casse.
     const REPLACEMENTS = {
       "je": "moi",
       "tu": "toi",
@@ -421,10 +420,6 @@ const WORD_LISTS = [
     // =========================
     // 3) PARAMÈTRES D'INTENSITÉ
     // =========================
-    // Plus l'intensité est haute :
-    // - plus on remplace de mots
-    // - plus on insère des mots/expressions
-    // - plus on “abîme” légèrement la ponctuation
     const INTENSITY_PRESETS = [
      { name: "léger",   replaceRate: 0.08, insertPerSentence: [0, 1], sprinklePunct: 0.06 },
      { name: "moyen",   replaceRate: 0.18, insertPerSentence: [2, 4], sprinklePunct: 0.12 },
@@ -497,10 +492,7 @@ const WORD_LISTS = [
     }
 
     function splitSentences(text) {
-      // Coupe de manière simple tout en gardant le séparateur
-      // Exemple: ["Salut", "!", " Comment ça va", "?", ...]
       const parts = text.split(/([.!?]+|\n+)/g);
-      // Recombine en segments “phrase + séparateur”
       const out = [];
       for (let i = 0; i < parts.length; i += 2) {
         const chunk = (parts[i] ?? "");
@@ -511,13 +503,10 @@ const WORD_LISTS = [
     }
 
     function tokenize(text) {
-      // Tokenisation légère : mots / espaces / ponctuation
-      // Permet de remplacer des "mots" en gardant la ponctuation.
       return text.match(/<\/?em>|[\p{L}\p{N}’']+|\s+|[^\s\p{L}\p{N}]+/gu) || [];
     }
 
     function applyCaseLike(source, target) {
-      // Adapte un remplacement à la casse du mot original.
       if (source.toUpperCase() === source) return target.toUpperCase();
       if (source[0] && source[0].toUpperCase() === source[0]) {
         return target.charAt(0).toUpperCase() + target.slice(1);
@@ -526,13 +515,11 @@ const WORD_LISTS = [
     }
 
     function maybeReplaceToken(tok, replaceRate, pool) {
-     // On ne touche qu'aux vrais mots
      if (!/^[\p{L}\p{N}’']+$/u.test(tok)) return tok;
 
      if (Math.random() > replaceRate) return tok;
      if (!pool || pool.length === 0) return tok;
 
-     // On évite de remplacer des mots trop courts (lisibilité)
      if (tok.length <= 2) return tok;
 
      const replacement = pick(pool);
@@ -540,13 +527,10 @@ const WORD_LISTS = [
      return `<em>${escapeHTML(applyCaseLike(tok, replacement))}</em>`;
     }
 
-
     function sprinkleExtraPunct(text, chance) {
-      // Ajoute parfois un tic de ponctuation en fin de segment
       if (Math.random() > chance) return text;
       const tics = ["...", "!!", "?!", "—"];
       const tic = pick(tics);
-      // Évite d’empiler 300 fois
       if (text.trim().endsWith(tic)) return text;
       return text.replace(/\s*$/, "") + " " + tic + " ";
     }
@@ -561,7 +545,6 @@ const WORD_LISTS = [
     }
 
     function copyToClipboard(text) {
-    // Clipboard API si dispo, sinon fallback textarea
     if (navigator.clipboard && window.isSecureContext) {
         return navigator.clipboard.writeText(text);
     }
@@ -585,7 +568,6 @@ const WORD_LISTS = [
 
     // Convertit le contenu HTML (avec <em>) en BBCode [i][/i]
     function outputToBBCode() {
-    // On reconstruit depuis le DOM pour récupérer le texte "décodé"
     const root = outputText.cloneNode(true);
 
     function walk(node) {
@@ -643,7 +625,7 @@ const WORD_LISTS = [
     if (insertPositions.length === 0) return out;
 
     const pos = pick(insertPositions);
-    const safeWord = `<em>${escapeHTML(w)}</em>`; // (bonus sécurité)
+    const safeWord = `<em>${escapeHTML(w)}</em>`; 
 
     tokens.splice(pos, 0, (pos === 0 ? "" : " ") + safeWord + " ");
     out = tokens.join("").replace(/\s{2,}/g, " ");
@@ -651,7 +633,6 @@ const WORD_LISTS = [
 
   return out;
 }
-
 
     // ============
     // MAIN TRANSFORM
@@ -666,7 +647,6 @@ const WORD_LISTS = [
       let insertedCount = 0;
 
       const transformed = segments.map(seg => {
-        // 1) remplacement mot à mot
         const toks = tokenize(seg).map(tok => {
           const before = tok;
           const after = maybeReplaceToken(tok, preset.replaceRate, pool);
@@ -676,15 +656,12 @@ const WORD_LISTS = [
 
         let rebuilt = toks.join("");
 
-        // 2) insertion de mots piochés dans les listes activées
         const beforeInsert = rebuilt;
         rebuilt = insertRandomWords(rebuilt, pool, preset.insertPerSentence);
         if (rebuilt !== beforeInsert) {
-          // estimation : pas exact mais utile
           insertedCount += 1;
         }
 
-        // 3) ponctuation parasite légère
         rebuilt = sprinkleExtraPunct(rebuilt, preset.sprinklePunct);
 
         return rebuilt;
