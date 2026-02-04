@@ -64,6 +64,14 @@
       user-select: none;
     }
     .check input { transform: scale(1.1); }
+
+    .check.custom {
+      border-color: rgba(138, 91, 255, 0.35);
+    }
+    .check.custom.checked {
+      background: rgba(138, 91, 255, 0.18);
+      border-color: rgba(138, 91, 255, 0.70);
+    }
     .controls {
       display: flex;
       flex-direction: column;
@@ -173,491 +181,506 @@
   </div>
 
   <script>
-    // ===============
-    // 1) LISTES
-    // ===============
-    const WORD_LISTS = [
-      {
-        id: "drunk",
-        label: "Ivre",
-        // remplacements possibles
-        words: [
-          "... le...", "et euuh..", " .. et je...", ".. non...", "... pis..", ".. non attend..",
-          " et euh... là", ".. pis alors...", "... j'crois...", ".t..T..Truc...", "... la...",
-          "..hein ?..", "..tu vois...", "..ou bien...", ".. un euh...", ".. non ?.. hein ?",
-          "... ou pas...", ".. enfin.. tu vois quoi...", ".. bidule...", ".. voilà quoi...",
-          ".. et euh... j'disais quoi...", "... parceque tu vois...", " genre...", " style...",
-          ".. raaah bordel...", ".. mais... euh..", "HIPS...", "... comment déjà...", " arf.",
-          "... machin..", "... le bazar là..", ".. le truc là...", "... truc..", ".. genre...",
-          ".. rôte...", ".. bordel..", "euh...", "huh...", "..le bazar quoi...", "... parceque.."
-        ],
-        // insertions possibles
-        inserts: [
-          "... ouais...", "et euuh..", " ...", " .. et je...", " non...", "... pis..",
-          ".. non attend..", " et euh... là", ".. pis alors...", " non ?.. Oui ?",
-          "..Hi hi hi ! ...", "... j'crois...", ".gghhh...", "..hin hin...", "..Hé hé...",
-          "..hein ?", "..ou bien...", ".. Qu'est-ce que...", " non ?.. Oui ?",
-          "... ou pas quoi...", ".. enfin.. tu vois quoi...", ".. ouais les gars...",
-          " voilà quoi...", ".. et euh... j'disais quoi...", "... parceque tu vois...",
-          "...", " genre...", " style...", " et paf...", " mais... euh..", "* HIPS *...",
-          "... comment déjà...", " arf.", "... truc..", " pfff...", "...", "...", "...",
-          "..", "..", "... ..."
-        ]
-      },
-      {
-        id: "terror",
-        label: "Terrorisé",
-        words: [
-          "zombie", "cadavre", "souffrances", "atroce", "pourriture", "infection", "putride",
-          "fantôme", "horrible", "immonde", "monstre", "tomate", "poire", "banane", "pomme",
-          "tulipe", "peur", "avion", "pépin", "rigolo", "fleur", "youpi-banane", "avion",
-          "polompolom", "sapine", "galinacée", "canard", "biloute", "berlingot", "patate",
-          "gourde", "carotte", "sapin", "papa Noël", "pelle", "pouic", "schtroumpfer",
-          "folie", "abeille", "patapon", "lalala", "manger", "dévorer", "broyer"
-        ],
-        inserts: [
-            ".. AH AH AH !...", "..vais tous vous...", "..les.. voix...", ".gghhh...", "NOOOoon !...",
-            "marmonne...", "..hin hin...", "ALLEZ VOUS EN !..", "des araignées...",
-            "..ils sont partout...", "..Lachez moi !..", ".. Ah... Ah ah..",
-            ".. qui est là ?..", "..rrRRR... RAAAAaah !", ".r.tuer...", "...ricane..", "...",
-            "..Petiiit papaa Noo.. NOOOON !!...", " et pirouette cacahuètes ...", "..hein ?",
-            "..froid..", "..ou bien...", ".. Qu'est-ce que...", " non ?.. Oui ?",
-            ". Pas du tout..", ".. Laissez moi !", "..Hi hi hi ! ...", "grogne...",
-            "... Mon beau sapiiin ! ....", ".. roule petit patapon ...",
-            "... toujours un beau temps au nord ...",
-            ".. Alouetteuuh gentiiil.. Hein ?..",
-            " car il y a longtemps que je t'aime...",
-            "mon ami Pierroooot", "et ainsi font font FONT !! Ah !..."
-        ]
-      },
-      {
-        id: "head",
-        label: "Blessé",
-        words: [
-            "...ggh..", "tousse...", "...argh..", "..gnn..", "... je...", ".g...", "grogne...",
-            "..Gn..", "..raah..", "....", " RAAH !..", "..le...", "qu.. non..."
-        ],
-        inserts: [
-          // Je crois qu'il n'y en a pas
-        ]
-      },
-      {
-        id: "Custom",
-        label: "Graines d'Opti",
-        // Liste de mots rajoutés pour les privates jokes
-        words: [
-          "C'est la faute à Botaire", "Chill", "opti", "légende"
-        ],
-        inserts: [
-          // 
-        ]
+// =========================================================
+// LISTES
+// - Custom : "Graines d'Opti" (peut se cumuler avec 1 seule modulation)
+// =========================================================
+const WORD_LISTS = [
+  {
+    id: "drunk",
+    label: "Ivre",
+    words: [
+      "... le...", "et euuh..", " .. et je...", ".. non...", "... pis..", ".. non attend..",
+      " et euh... là", ".. pis alors...", "... j'crois...", ".t..T..Truc...", "... la...",
+      "..hein ?..", "..tu vois...", "..ou bien...", ".. un euh...", ".. non ?.. hein ?",
+      "... ou pas...", ".. enfin.. tu vois quoi...", ".. bidule...", ".. voilà quoi...",
+      ".. et euh... j'disais quoi...", "... parceque tu vois...", " genre...", " style...",
+      ".. raaah bordel...", ".. mais... euh..", "HIPS...", "... comment déjà...", " arf.",
+      "... machin..", "... le bazar là..", ".. le truc là...", "... truc..", ".. genre...",
+      ".. rôte...", ".. bordel..", "euh...", "huh...", "..le bazar quoi...", "... parceque.."
+    ],
+    inserts: [
+      "... ouais...", "et euuh..", " ...", " .. et je...", " non...", "... pis..",
+      ".. non attend..", " et euh... là", ".. pis alors...", " non ?.. Oui ?",
+      "..Hi hi hi ! ...", "... j'crois...", ".gghhh...", "..hin hin...", "..Hé hé...",
+      "..hein ?", "..ou bien...", ".. Qu'est-ce que...", " non ?.. Oui ?",
+      "... ou pas quoi...", ".. enfin.. tu vois quoi...", ".. ouais les gars...",
+      " voilà quoi...", ".. et euh... j'disais quoi...", "... parceque tu vois...",
+      "...", " genre...", " style...", " et paf...", " mais... euh..", "* HIPS *...",
+      "... comment déjà...", " arf.", "... truc..", " pfff...", "...", "...", "...",
+      "..", "..", "... ..."
+    ]
+  },
+  {
+    id: "terror",
+    label: "Terrorisé",
+    words: [
+      "zombie", "cadavre", "souffrances", "atroce", "pourriture", "infection", "putride",
+      "fantôme", "horrible", "immonde", "monstre", "tomate", "poire", "banane", "pomme",
+      "tulipe", "peur", "avion", "pépin", "rigolo", "fleur", "youpi-banane", "avion",
+      "polompolom", "sapine", "galinacée", "canard", "biloute", "berlingot", "patate",
+      "gourde", "carotte", "sapin", "papa Noël", "pelle", "pouic", "schtroumpfer",
+      "folie", "abeille", "patapon", "lalala", "manger", "dévorer", "broyer"
+    ],
+    inserts: [
+      ".. AH AH AH !...", "..vais tous vous...", "..les.. voix...", ".gghhh...", "NOOOoon !...",
+      "marmonne...", "..hin hin...", "ALLEZ VOUS EN !..", "des araignées...",
+      "..ils sont partout...", "..Lachez moi !..", ".. Ah... Ah ah..",
+      ".. qui est là ?..", "..rrRRR... RAAAAaah !", ".r.tuer...", "...ricane..", "...",
+      "..Petiiit papaa Noo.. NOOOON !!...", " et pirouette cacahuètes ...", "..hein ?",
+      "..froid..", "..ou bien...", ".. Qu'est-ce que...", " non ?.. Oui ?",
+      ". Pas du tout..", ".. Laissez moi !", "..Hi hi hi ! ...", "grogne...",
+      "... Mon beau sapiiin ! ....", ".. roule petit patapon ...",
+      "... toujours un beau temps au nord ...",
+      ".. Alouetteuuh gentiiil.. Hein ?..",
+      " car il y a longtemps que je t'aime...",
+      "mon ami Pierroooot", "et ainsi font font FONT !! Ah !..."
+    ]
+  },
+  {
+    id: "head",
+    label: "Blessé",
+    words: [
+      "...ggh..", "tousse...", "...argh..", "..gnn..", "... je...", ".g...", "grogne...",
+      "..Gn..", "..raah..", "....", " RAAH !..", "..le...", "qu.. non..."
+    ],
+    inserts: [
+      "...ggh..", "tousse...", "...argh..", "..gnn..", "... je...", ".g...", "grogne...",
+      "..Gn..", "..raah..", "....", " RAAH !..", "..le...", "qu.. non..."
+    ]
+  },
+  {
+    id: "Custom",
+    label: "Graines d'Opti",
+    words: [],
+    inserts: ["C'est la faute à Botaire", "Chill", "opti", "légende"]
+  }
+];
+
+// =========================
+// PARAMÈTRES D'INTENSITÉ (scaling)
+// =========================
+const INTENSITY_PRESETS = [
+  { name: "Faible",    scale: 0.7 },
+  { name: "Original",  scale: 1.0 },
+  { name: "Accentué",  scale: 1.5 }
+];
+
+// ============
+// UI BUILD
+// ============
+const listsBox = document.getElementById("listsBox");
+const intensity = document.getElementById("intensity");
+const intensityLabel = document.getElementById("intensityLabel");
+const inputText = document.getElementById("inputText");
+const outputText = document.getElementById("outputText");
+const toast = document.getElementById("toast");
+
+const MAIN_IDS = ["drunk", "terror", "head"];
+const CUSTOM_ID = "Custom";
+
+function getList(id) {
+  return WORD_LISTS.find(x => x.id === id);
+}
+
+function syncCustomStyle() {
+  const cb = document.getElementById(CUSTOM_ID);
+  const wrap = cb?.closest("label.check");
+  if (!wrap) return;
+  wrap.classList.toggle("checked", !!cb.checked);
+}
+
+function enforceExclusiveMain(changedId) {
+  const changed = document.getElementById(changedId);
+  if (!changed) return;
+
+  if (changed.checked && MAIN_IDS.includes(changedId)) {
+    MAIN_IDS.forEach(id => {
+      if (id !== changedId) {
+        const other = document.getElementById(id);
+        if (other) other.checked = false;
       }
-    
-    ];
+    });
+  }
 
-    // =========================
-    // 2) PARAMÈTRES D'INTENSITÉ
-    // =========================
-    // Sert à scaler la "violence" des modulations
-    const INTENSITY_PRESETS = [
-      { name: "Faible",   scale: 0.8, sprinklePunct: 0.06 },
-      { name: "Original",   scale: 1.0, sprinklePunct: 0.12 },
-      { name: "Accentué", scale: 1.35, sprinklePunct: 0.22 }
-    ];
+  const anyMain = MAIN_IDS.some(id => document.getElementById(id)?.checked);
+  if (!anyMain) {
+    changed.checked = true;
+  }
+}
 
-    // ============
-    // UI BUILD
-    // ============
-    const listsBox = document.getElementById("listsBox");
-    const intensity = document.getElementById("intensity");
-    const intensityLabel = document.getElementById("intensityLabel");
-    const inputText = document.getElementById("inputText");
-    const outputText = document.getElementById("outputText");
-    const toast = document.getElementById("toast");
+function buildListsUI() {
+  listsBox.innerHTML = "";
+  WORD_LISTS.forEach(l => {
+    const wrap = document.createElement("label");
+    wrap.className = "check" + (l.id === CUSTOM_ID ? " custom" : "");
 
-    function buildListsUI() {
-      listsBox.innerHTML = "";
-      WORD_LISTS.forEach(l => {
-        const wrap = document.createElement("label");
-        wrap.className = "check";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.id = l.id;
 
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.checked = true;
-        cb.id = l.id;
+    if (l.id === "drunk") cb.checked = true;
+    else cb.checked = false;
 
-        const span = document.createElement("span");
-        span.textContent = l.label;
+    cb.addEventListener("change", () => {
+      if (MAIN_IDS.includes(l.id)) enforceExclusiveMain(l.id);
+      if (l.id === CUSTOM_ID) syncCustomStyle();
+    });
 
-        wrap.appendChild(cb);
-        wrap.appendChild(span);
-        listsBox.appendChild(wrap);
-      });
+    const span = document.createElement("span");
+    span.textContent = l.label;
+
+    wrap.appendChild(cb);
+    wrap.appendChild(span);
+    listsBox.appendChild(wrap);
+  });
+
+  syncCustomStyle();
+}
+
+function updateIntensityLabel() {
+  const preset = INTENSITY_PRESETS[Number(intensity.value)];
+  intensityLabel.textContent = preset.name;
+}
+
+buildListsUI();
+updateIntensityLabel();
+intensity.addEventListener("input", updateIntensityLabel);
+
+// ============
+// HELPERS
+// ============
+function randInt(min, max) { // inclusive
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function escapeHTML(str) {
+  return (str ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function tokenize(text) {
+  // Conserve <em>...</em>
+  return text.match(/<\/??em>|[\p{L}\p{N}’']+|\s+|[^\s\p{L}\p{N}]+/gu) || [];
+}
+
+function splitSentences(text) {
+  const parts = text.split(/([.!?]+|\n+)/g);
+  const out = [];
+  for (let i = 0; i < parts.length; i += 2) {
+    const chunk = (parts[i] ?? "");
+    const sep = (parts[i + 1] ?? "");
+    out.push(chunk + sep);
+  }
+  return out.filter(s => s.length > 0);
+}
+
+function applyCaseLike(source, target) {
+  if (source.toUpperCase() === source) return target.toUpperCase();
+  if (source[0] && source[0].toUpperCase() === source[0]) {
+    return target.charAt(0).toUpperCase() + target.slice(1);
+  }
+  return target;
+}
+
+function flash(btn, msg = "Copié ✅") {
+  const old = btn.textContent;
+  btn.textContent = msg;
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = old;
+    btn.disabled = false;
+  }, 900);
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+  return new Promise((resolve, reject) => {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error("copy failed"));
+    } catch (e) {
+      reject(e);
     }
+  });
+}
 
-    function updateIntensityLabel() {
-      const preset = INTENSITY_PRESETS[Number(intensity.value)];
-      intensityLabel.textContent = preset.name;
+// Convertit le contenu HTML (avec <em>) en BBCode [i][/i]
+function outputToBBCode() {
+  const root = outputText.cloneNode(true);
+
+  function walk(node) {
+    if (node.nodeType === Node.TEXT_NODE) return node.nodeValue;
+    if (node.nodeType !== Node.ELEMENT_NODE) return "";
+
+    const tag = node.tagName.toLowerCase();
+    if (tag === "em") {
+      let inside = "";
+      node.childNodes.forEach(ch => inside += walk(ch));
+      return `[i]${inside}[/i]`;
     }
+    if (tag === "br") return "\n";
 
-    buildListsUI();
-    updateIntensityLabel();
-    intensity.addEventListener("input", updateIntensityLabel);
+    let out = "";
+    node.childNodes.forEach(ch => out += walk(ch));
+    return out;
+  }
 
-    // ============
-    // HELPERS
-    // ============
-    function randInt(min, max) { // inclusive
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+  let result = "";
+  root.childNodes.forEach(ch => result += walk(ch));
+  return result;
+}
+
+// ============
+// MODULATIONS
+// ============
+function isWord(tok) {
+  return /^[\p{L}\p{N}’']+$/u.test(tok);
+}
+
+function wordTokenIndexes(tokens) {
+  const idxs = [];
+  let inEm = false;
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (t === "<em>")  { inEm = true; continue; }
+    if (t === "</em>") { inEm = false; continue; }
+    if (!inEm && isWord(t)) idxs.push(i);
+  }
+  return idxs;
+}
+
+function lenFactor(word) {
+  const n = Math.max(1, word.length);
+  return Math.min(2.0, n / 25.0);
+}
+
+// A) double-letter : injecte "X...x..." (signature drunk/terror)
+function modDoubleLetters(word, chance) {
+  if (word.length < 2) return word;
+  if (Math.random() > chance) return word;
+
+  const useHead = Math.random() < 0.5;
+  const idx = useHead ? 0 : randInt(0, word.length - 1);
+  const ch = word[idx];
+
+  if (!/[\p{L}]/u.test(ch)) return word;
+  const lower = ch.toLowerCase();
+
+  if (idx === 0) {
+    return `${ch}...${lower}...` + word;
+  }
+  return word.slice(0, idx) + `...${lower}...` + word.slice(idx);
+}
+
+function applyDoubleLettersAll(tokens, chance) {
+  for (let i = 0; i < tokens.length; i++) {
+    if (!isWord(tokens[i])) continue;
+    const before = tokens[i];
+    const after = modDoubleLetters(before, chance);
+    if (after !== before) {
+      tokens[i] = `<em>${escapeHTML(after)}</em>`;
     }
+  }
+}
 
-    function pick(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
+// B) insert/replace sur mot cible
+function modInsertReplace(tokens, wordIdxToken, replaceChance, wordsPool, insertsPool) {
+  if (!tokens[wordIdxToken] || !isWord(tokens[wordIdxToken])) return { didReplace: false, didInsert: false };
 
-    function escapeHTML(str) {
-      return (str ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;");
-    }
+  const original = tokens[wordIdxToken];
+  if (original.length <= 2) return { didReplace: false, didInsert: false };
 
-    function tokenize(text) {
-      // Conserve <em>...</em> 
-      return text.match(/<\/??em>|[\p{L}\p{N}’']+|\s+|[^\s\p{L}\p{N}]+/gu) || [];
-    }
+  const doReplace = Math.random() < replaceChance;
 
-    function splitSentences(text) {
-      const parts = text.split(/([.!?]+|\n+)/g);
-      const out = [];
-      for (let i = 0; i < parts.length; i += 2) {
-        const chunk = (parts[i] ?? "");
-        const sep = (parts[i+1] ?? "");
-        out.push(chunk + sep);
-      }
-      return out.filter(s => s.length > 0);
-    }
+  if (doReplace && wordsPool.length > 0) {
+    const rep = pick(wordsPool);
+    const final = applyCaseLike(original, rep);
+    tokens[wordIdxToken] = `<em>${escapeHTML(final)}</em>`;
+    return { didReplace: true, didInsert: false };
+  }
 
-    function applyCaseLike(source, target) {
-      if (source.toUpperCase() === source) return target.toUpperCase();
-      if (source[0] && source[0].toUpperCase() === source[0]) {
-        return target.charAt(0).toUpperCase() + target.slice(1);
-      }
-      return target;
-    }
+  if (!doReplace && insertsPool.length > 0) {
+    const ins = pick(insertsPool);
+    const safeIns = `<em>${escapeHTML(ins)}</em>`;
+    tokens.splice(wordIdxToken, 0, safeIns, " ");
+    return { didReplace: false, didInsert: true };
+  }
 
-    function sprinkleExtraPunct(text, chance) {
-      if (Math.random() > chance) return text;
-      const tics = ["...", "!!", "?!", "—"];
-      const tic = pick(tics);
-      if (text.trim().endsWith(tic)) return text;
-      return text.replace(/\s*$/, "") + " " + tic + " ";
-    }
+  return { didReplace: false, didInsert: false };
+}
 
-    function flash(btn, msg = "Copié ✅") {
-      const old = btn.textContent;
-      btn.textContent = msg;
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.textContent = old;
-        btn.disabled = false;
-      }, 900);
-    }
+// C) head : insertion au milieu du mot
+function modHead(word, pool) {
+  if (!isWord(word)) return word;
+  if (pool.length === 0) return word;
+  const ins = pick(pool);
+  const pos = randInt(0, word.length);
+  return word.slice(0, pos) + ins + word.slice(pos);
+}
 
-    function copyToClipboard(text) {
-      if (navigator.clipboard && window.isSecureContext) {
-        return navigator.clipboard.writeText(text);
-      }
-      return new Promise((resolve, reject) => {
-        try {
-          const ta = document.createElement("textarea");
-          ta.value = text;
-          ta.setAttribute("readonly", "");
-          ta.style.position = "fixed";
-          ta.style.left = "-9999px";
-          document.body.appendChild(ta);
-          ta.select();
-          const ok = document.execCommand("copy");
-          document.body.removeChild(ta);
-          ok ? resolve() : reject(new Error("copy failed"));
-        } catch (e) {
-          reject(e);
+function getSelectedMainId() {
+  if (document.getElementById("drunk")?.checked)  return "drunk";
+  if (document.getElementById("terror")?.checked) return "terror";
+  if (document.getElementById("head")?.checked)   return "head";
+  return null;
+}
+
+// ============
+// MAIN TRANSFORM
+// ============
+function transformText(text) {
+  // ~5%: aucun changement
+  if (Math.random() < 0.05) {
+    return { text: text.trim(), replacedCount: 0, insertedCount: 0 };
+  }
+
+  const preset = INTENSITY_PRESETS[Number(intensity.value)];
+  const scale = preset.scale;
+
+  const mainId = getSelectedMainId();
+  if (!mainId) return { text: text.trim(), replacedCount: 0, insertedCount: 0 };
+
+  const main = getList(mainId) || { words: [], inserts: [] };
+  const customEnabled = !!document.getElementById(CUSTOM_ID)?.checked;
+  const custom = customEnabled ? (getList(CUSTOM_ID) || { words: [], inserts: [] }) : { words: [], inserts: [] };
+
+  const segments = splitSentences(text);
+  let replacedCount = 0;
+  let insertedCount = 0;
+
+  const transformed = segments.map(seg => {
+    const tokens = tokenize(seg);
+    const wordIdxs = wordTokenIndexes(tokens);
+    if (wordIdxs.length === 0) return seg;
+
+    const targetTokenIndex = pick(wordIdxs);
+    const targetWord = tokens[targetTokenIndex];
+    const factor = lenFactor(targetWord);
+
+    const applyOne = (tokenIndex, factorLocal = 1.0) => {
+      const w = tokens[tokenIndex];
+      if (!w || !isWord(w)) return;
+
+      if (mainId === "head") {
+        const pool = [
+          ...(main.words ?? []),
+          ...(main.inserts ?? []),
+          ...(custom.words ?? []),
+          ...(custom.inserts ?? [])
+        ];
+        const mutated = modHead(w, pool);
+        if (mutated !== w) {
+          tokens[tokenIndex] = `<em>${escapeHTML(mutated)}</em>`;
+          insertedCount += 1;
         }
-      });
-    }
-
-    // Convertit le contenu HTML (avec <em>) en BBCode [i][/i]
-    function outputToBBCode() {
-      const root = outputText.cloneNode(true);
-
-      function walk(node) {
-        if (node.nodeType === Node.TEXT_NODE) return node.nodeValue;
-        if (node.nodeType !== Node.ELEMENT_NODE) return "";
-
-        const tag = node.tagName.toLowerCase();
-        if (tag === "em") {
-          let inside = "";
-          node.childNodes.forEach(ch => inside += walk(ch));
-          return `[i]${inside}[/i]`;
-        }
-        if (tag === "br") return "\n";
-
-        let out = "";
-        node.childNodes.forEach(ch => out += walk(ch));
-        return out;
-      }
-
-      let result = "";
-      root.childNodes.forEach(ch => result += walk(ch));
-      return result;
-    }
-
-    // =========================
-    // 3) MODULATIONS (bitmask)
-    // =========================
-    const ModulationNone   = 0;
-    const ModulationDrunk  = 1 << 1; // 2
-    const ModulationTerror = 1 << 2; // 4
-    const ModulationHead   = 1 << 3; // 8
-
-    function getList(id) {
-      return WORD_LISTS.find(x => x.id === id);
-    }
-
-    function activeMask() {
-      let mask = ModulationNone;
-      if (document.getElementById("drunk")?.checked)  mask |= ModulationDrunk;
-      if (document.getElementById("terror")?.checked) mask |= ModulationTerror;
-      if (document.getElementById("head")?.checked)   mask |= ModulationHead;
-      return mask;
-    }
-
-    function pickActiveModulation(mask) {
-      const mods = [];
-      if ((mask & ModulationDrunk)  === ModulationDrunk)  mods.push(ModulationDrunk);
-      if ((mask & ModulationTerror) === ModulationTerror) mods.push(ModulationTerror);
-      if ((mask & ModulationHead)   === ModulationHead)   mods.push(ModulationHead);
-      if (mods.length === 0) return ModulationNone;
-      return pick(mods);
-    }
-
-    function isWord(tok) {
-      return /^[\p{L}\p{N}’']+$/u.test(tok);
-    }
-
-    function wordTokenIndexes(tokens) {
-      const idxs = [];
-      let inEm = false;
-      for (let i = 0; i < tokens.length; i++) {
-        const t = tokens[i];
-        if (t === "<em>")  { inEm = true; continue; }
-        if (t === "</em>") { inEm = false; continue; }
-        if (!inEm && isWord(t)) idxs.push(i);
-      }
-      return idxs;
-    }
-
-    function lenFactor(word) {
-      const n = Math.max(1, word.length);
-      return Math.min(2.0, n / 25.0);
-    }
-
-    // A) double-letter : injecte "X...x..." (signature drunk/terror)
-    function modDoubleLetters(word, chance) {
-      if (word.length < 2) return word;
-      if (Math.random() > chance) return word;
-
-      const useHead = Math.random() < 0.5;
-      const idx = useHead ? 0 : randInt(0, word.length - 1);
-      const ch = word[idx];
-
-      if (!/[\p{L}]/u.test(ch)) return word;
-
-      const lower = ch.toLowerCase();
-
-      // proche du PHP : si idx==0 => "X...x..." + word, sinon insertion "...x..."
-      if (idx === 0) {
-        return `${ch}...${lower}...` + word;
-      }
-      return word.slice(0, idx) + `...${lower}...` + word.slice(idx);
-    }
-
-    // B) insert/replace sur mot cible
-    function modInsertReplace(tokens, wordIdxToken, replaceChance, wordsPool, insertsPool) {
-      if (!tokens[wordIdxToken] || !isWord(tokens[wordIdxToken])) return { didReplace: false, didInsert: false };
-
-      const original = tokens[wordIdxToken];
-      if (original.length <= 2) return { didReplace: false, didInsert: false };
-
-      const doReplace = Math.random() < replaceChance;
-
-      if (doReplace && wordsPool.length > 0) {
-        const rep = pick(wordsPool);
-        const final = applyCaseLike(original, rep);
-        tokens[wordIdxToken] = `<em>${escapeHTML(final)}</em>`;
-        return { didReplace: true, didInsert: false };
-      }
-
-      if (!doReplace && insertsPool.length > 0) {
-        const ins = pick(insertsPool);
-        const safeIns = `<em>${escapeHTML(ins)}</em>`;
-        tokens.splice(wordIdxToken, 0, safeIns, " ");
-        return { didReplace: false, didInsert: true };
-      }
-
-      return { didReplace: false, didInsert: false };
-    }
-
-    // C) head : insertion au milieu du mot
-    function modHead(word, pool) {
-      if (!isWord(word)) return word;
-      if (pool.length === 0) return word;
-      const ins = pick(pool);
-      const pos = randInt(0, word.length);
-      return word.slice(0, pos) + ins + word.slice(pos);
-    }
-
-    // ============
-    // MAIN TRANSFORM 
-    // ============
-    function transformText(text) {
-      text = escapeHTML(text);
-
-      // ~5%: aucun changement (comme l'original)
-      if (Math.random() < 0.05) {
-        return { text: text.trim(), replacedCount: 0, insertedCount: 0 };
-      }
-
-      const preset = INTENSITY_PRESETS[Number(intensity.value)];
-      const scale = preset.scale;
-
-      const mask = activeMask();
-      if (mask === ModulationNone) {
-        return { text: text.trim(), replacedCount: 0, insertedCount: 0 };
-      }
-
-      const drunk  = getList("drunk")  || { words: [], inserts: [] };
-      const terror = getList("terror") || { words: [], inserts: [] };
-      const head   = getList("head")   || { words: [], inserts: [] };
-
-      const segments = splitSentences(text);
-
-      let replacedCount = 0;
-      let insertedCount = 0;
-
-      const transformed = segments.map(seg => {
-        const tokens = tokenize(seg);
-        const wordIdxs = wordTokenIndexes(tokens);
-        if (wordIdxs.length === 0) return seg;
-
-        const targetTokenIndex = pick(wordIdxs);
-        const targetWord = tokens[targetTokenIndex];
-        const factor = lenFactor(targetWord);
-
-        const mod = pickActiveModulation(mask);
-
-        const applyOne = (tokenIndex, chosenMod, factorLocal=1.0) => {
-          const w = tokens[tokenIndex];
-          if (!w || !isWord(w)) return;
-
-          if (chosenMod === ModulationHead) {
-            const pool = head.inserts ?? [];
-            const mutated = modHead(w, pool);
-            if (mutated !== w) {
-              tokens[tokenIndex] = `<em>${escapeHTML(mutated)}</em>`;
-              insertedCount += 1;
-            }
-            return;
-          }
-
-          const isTerror = chosenMod === ModulationTerror;
-
-          const dlChance  = (isTerror ? 0.075 : 0.033) * factorLocal * scale;
-          const repChance = (isTerror ? 0.75  : 0.33 ) * factorLocal * scale;
-
-          // 1) double-letter
-          const dl = modDoubleLetters(w, dlChance);
-          if (dl !== w) {
-            tokens[tokenIndex] = `<em>${escapeHTML(dl)}</em>`;
-            insertedCount += 1;
-          }
-
-          // 2) insert/replace
-          const wordsPool   = (isTerror ? (terror.words ?? [])   : (drunk.words ?? []));
-          const insertsPool = (isTerror ? (terror.inserts ?? []) : (drunk.inserts ?? []));
-
-          const res = modInsertReplace(tokens, tokenIndex, repChance, wordsPool, insertsPool);
-          if (res.didReplace) replacedCount += 1;
-          if (res.didInsert)  insertedCount += 1;
-        };
-
-        // Action principale sur un mot pivot
-        applyOne(targetTokenIndex, mod, factor);
-
-        // Bonus "mot très long" (une seule fois)
-        const longCandidates = wordIdxs.filter(i => i !== targetTokenIndex && (tokens[i] || "").length > 24);
-        if (longCandidates.length > 0 && Math.random() < 0.35 * scale) {
-          const idx2 = pick(longCandidates);
-          const mod2 = pickActiveModulation(mask);
-          applyOne(idx2, mod2, lenFactor(tokens[idx2]) * 1.1);
-        }
-
-        let rebuilt = tokens.join("").replace(/\s{2,}/g, " ");
-        rebuilt = sprinkleExtraPunct(rebuilt, preset.sprinklePunct);
-        return rebuilt;
-      }).join("");
-
-      return { text: transformed.replace(/\s{2,}/g, " ").trim(), replacedCount, insertedCount };
-    }
-
-    // ============
-    // BUTTONS
-    // ============
-    document.getElementById("transformBtn").addEventListener("click", () => {
-      const src = inputText.value || "";
-      if (!src.trim()) {
-        outputText.innerHTML = "";
-        toast.textContent = "Entre du texte 🙂";
         return;
       }
 
-      const res = transformText(src);
-      outputText.innerHTML = res.text;
-      toast.textContent = "Transformé ✅";
-      setTimeout(() => toast.textContent = "", 1400);
-    });
+      const isTerror = mainId === "terror";
+      applyDoubleLettersAll(tokens, isTerror ? 0.075 : 0.033, scale);
 
-    document.getElementById("copyBtn").addEventListener("click", async () => {
-      const plain = outputText.innerText || "";
-      if (!plain.trim()) return;
+      const repChance = (isTerror ? 0.75  : 0.33 ) * factorLocal * scale;
 
-      const btn = document.getElementById("copyBtn");
-      try {
-        await copyToClipboard(plain);
-        toast.textContent = "Copie normale OK ✅";
-        flash(btn);
-      } catch {
-        toast.textContent = "Copie impossible ❌ (navigateur/HTTPS)";
-      } finally {
-        setTimeout(() => toast.textContent = "", 1400);
-      }
-    });
+      // 2) insert/replace
+      const wordsPool = [...(main.words ?? []), ...(custom.words ?? [])];
+      const insertsPool = [...(main.inserts ?? []), ...(custom.inserts ?? [])];
 
-    document.getElementById("copyForumBtn").addEventListener("click", async () => {
-      const bb = outputToBBCode();
-      if (!bb.trim()) return;
+      const res = modInsertReplace(tokens, tokenIndex, repChance, wordsPool, insertsPool);
+      if (res.didReplace) replacedCount += 1;
+      if (res.didInsert)  insertedCount += 1;
+    };
 
-      const btn = document.getElementById("copyForumBtn");
-      try {
-        await copyToClipboard(bb);
-        toast.textContent = "Copie forum (BBCode) OK ✅";
-        flash(btn);
-      } catch {
-        toast.textContent = "Copie impossible ❌ (navigateur/HTTPS)";
-      } finally {
-        setTimeout(() => toast.textContent = "", 1400);
-      }
-    });
+    applyOne(targetTokenIndex, factor);
+
+    // Bonus "mot très long" (une seule fois)
+    const longCandidates = wordIdxs.filter(i => i !== targetTokenIndex && (tokens[i] || "").length > 24);
+    if (longCandidates.length > 0 && Math.random() < 0.5 * scale) {
+      const idx2 = pick(longCandidates);
+      applyOne(idx2, lenFactor(tokens[idx2]) * 1.1);
+    }
+
+    // rebuild safe (autorise <em> uniquement)
+    const rebuilt = tokens.map(t => {
+      if (t === "<em>" || t === "</em>") return t;
+      if (t.startsWith("<em>") && t.endsWith("</em>")) return t;
+      return escapeHTML(t);
+    }).join("").replace(/\s{2,}/g, " ");
+
+    return rebuilt;
+  }).join("");
+
+  return {
+    text: transformed.replace(/\s{2,}/g, " ").trim(),
+    replacedCount,
+    insertedCount
+  };
+}
+
+// ============
+// BUTTONS
+// ============
+document.getElementById("transformBtn").addEventListener("click", () => {
+  const src = inputText.value || "";
+  if (!src.trim()) {
+    outputText.innerHTML = "";
+    toast.textContent = "Entre du texte 🙂";
+    return;
+  }
+
+  const res = transformText(src);
+  outputText.innerHTML = res.text;
+  toast.textContent = "Transformé ✅";
+  setTimeout(() => toast.textContent = "", 1400);
+});
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const plain = outputText.innerText || "";
+  if (!plain.trim()) return;
+
+  const btn = document.getElementById("copyBtn");
+  try {
+    await copyToClipboard(plain);
+    toast.textContent = "Copie normale OK ✅";
+    flash(btn);
+  } catch {
+    toast.textContent = "Copie impossible ❌ (navigateur/HTTPS)";
+  } finally {
+    setTimeout(() => toast.textContent = "", 1400);
+  }
+});
+
+document.getElementById("copyForumBtn").addEventListener("click", async () => {
+  const bb = outputToBBCode();
+  if (!bb.trim()) return;
+
+  const btn = document.getElementById("copyForumBtn");
+  try {
+    await copyToClipboard(bb);
+    toast.textContent = "Copie forum (BBCode) OK ✅";
+    flash(btn);
+  } catch {
+    toast.textContent = "Copie impossible ❌ (navigateur/HTTPS)";
+  } finally {
+    setTimeout(() => toast.textContent = "", 1400);
+  }
+});
   </script>
 </body>
 </html>
